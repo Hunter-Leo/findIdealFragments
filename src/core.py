@@ -44,14 +44,13 @@ class SequenceNumRotateCalculation:
         ideal_value: float, 
         window_apply_method: Literal['sum', 'mean'] = 'mean',
         filter_out_partial_overlaped_result: bool = True
-    ) -> List[Tuple[int, int]]:
+    ) -> Tuple[float, List[Tuple[int, int]]]:
         """
         查找最接近理想值的连续窗口
         
         Args:
             ideal_value: 理想值
             window_apply_method: 窗口计算方法
-            rank: 排名，1表示最接近的
             filter_out_partial_overlaped_result: 是否过滤部分重叠的结果
             
         Returns:
@@ -69,7 +68,7 @@ class SequenceNumRotateCalculation:
         window_apply_method: Literal['sum', 'mean'] = 'mean',
         filter_out_partial_overlaped_result: bool = True,
         chunk_size: int = 10**6
-    ) -> List[Tuple[int, int]]:
+    ) ->  Tuple[float, List[Tuple[int, int]]]:
         """
         分块处理大数组，查找理想窗口
         
@@ -84,6 +83,7 @@ class SequenceNumRotateCalculation:
         """
         all_candidates = []
         min_diff = float('inf')
+        closest_score = None
         
         # 计算总块数
         total_chunks = (self.length - self.window + chunk_size) // chunk_size
@@ -114,6 +114,7 @@ class SequenceNumRotateCalculation:
             if chunk_min_diff == min_diff:
                 # 找到当前块中的候选索引
                 chunk_candidates = np.where(chunk_diff == chunk_min_diff)[0]
+                closest_score = chunk_window_values[chunk_candidates[0]]
                 # 调整索引到原始数组
                 adjusted_indices = chunk_candidates + start_idx
                 all_candidates.extend(adjusted_indices)
@@ -121,9 +122,7 @@ class SequenceNumRotateCalculation:
         if not all_candidates:
             return []
         
-        # 排序并分组连续索引
-        all_candidates.sort()
-        return self._group_consecutive_indices(np.array(all_candidates), filter_out_partial_overlaped_result)
+        return float(closest_score), self._group_consecutive_indices(np.array(all_candidates), filter_out_partial_overlaped_result)
     
     def _group_consecutive_indices(
         self, 
@@ -159,7 +158,7 @@ class SequenceNumRotateCalculation:
             filtered_result = [result[0]]
             
             for i in range(1, len(result)):
-                if result[i][0] - filtered_result[-1][0] >= self.window:
+                if result[i][0] - (filtered_result[-1][0]+filtered_result[-1][1]+self.window-1) >= 0:
                     filtered_result.append(result[i])
             
             result = filtered_result
@@ -191,5 +190,5 @@ if __name__ == '__main__':
     arr_rotator = SequenceNumRotateCalculation(2000, long_arr)
     result = arr_rotator.find_ideal_consecutive_windows(1, 'mean', True)
     print(f'Time consumed for sequence with length {test_size}: {time.time()-start:.2f}s')
-    print(f'Found {len(result)} ideal windows')
+    print(f'Found {len(result[1])} ideal windows')
     pass
