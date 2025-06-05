@@ -19,7 +19,7 @@ class IterableSequenceNumRotateCalculation:
         """
         self.window = window
         # 使用弱引用存储原始数组，避免复制大数组
-        self.arr = arr
+        self.arr = arr if isinstance(arr, np.ndarray) else np.array(arr)
         self.length = len(arr)
         assert window <= self.length, 'window must be less than or equal to the length of the array'
         self.excluding_window_list = excluding_window_list
