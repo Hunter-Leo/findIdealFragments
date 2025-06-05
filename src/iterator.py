@@ -50,7 +50,7 @@ class IterableSequenceNumRotateCalculation:
         self,
         ideal_value: float,
         window_apply_method: Literal['sum', 'mean'] = 'mean',
-        filter_out_partial_overlaped_result: bool = True,
+        filter_out_partial_overlapped_result: bool = True,
     )->Tuple[float, List[Tuple[int, int]]]:
         """
         查找下一轮理想窗口
@@ -58,7 +58,7 @@ class IterableSequenceNumRotateCalculation:
         Args:
             ideal_value: 理想值
             window_apply_method: 窗口计算方法
-            filter_out_partial_overlaped_result: 是否过滤部分重叠的结果
+            filter_out_partial_overlapped_result: 是否过滤部分重叠的结果
 
         Returns:
             列表，每个元素为(起始索引, 连续窗口数量)
@@ -72,7 +72,7 @@ class IterableSequenceNumRotateCalculation:
             sub_score, sub_windows = arr_rotator.find_ideal_consecutive_windows(
                 ideal_value=ideal_value,
                 window_apply_method=window_apply_method,
-                filter_out_partial_overlaped_result=filter_out_partial_overlaped_result
+                filter_out_partial_overlapped_result=filter_out_partial_overlapped_result
             )
             sub_diff = abs(sub_score - ideal_value)
             if sub_diff < min_diff:

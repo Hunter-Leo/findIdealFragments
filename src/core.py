@@ -43,7 +43,7 @@ class SequenceNumRotateCalculation:
         self, 
         ideal_value: float, 
         window_apply_method: Literal['sum', 'mean'] = 'mean',
-        filter_out_partial_overlaped_result: bool = True
+        filter_out_partial_overlapped_result: bool = True
     ) -> Tuple[float, List[Tuple[int, int]]]:
         """
         查找最接近理想值的连续窗口
@@ -51,14 +51,14 @@ class SequenceNumRotateCalculation:
         Args:
             ideal_value: 理想值
             window_apply_method: 窗口计算方法
-            filter_out_partial_overlaped_result: 是否过滤部分重叠的结果
+            filter_out_partial_overlapped_result: 是否过滤部分重叠的结果
             
         Returns:
             列表，每个元素为(起始索引, 连续窗口数量)
         """
         # 对于超大数组，使用分块处理
         return self._find_ideal_windows_chunked(
-                ideal_value, window_apply_method, filter_out_partial_overlaped_result
+                ideal_value, window_apply_method, filter_out_partial_overlapped_result
             )
             
         
@@ -66,7 +66,7 @@ class SequenceNumRotateCalculation:
         self,
         ideal_value: float,
         window_apply_method: Literal['sum', 'mean'] = 'mean',
-        filter_out_partial_overlaped_result: bool = True,
+        filter_out_partial_overlapped_result: bool = True,
         chunk_size: int = 10**6
     ) ->  Tuple[float, List[Tuple[int, int]]]:
         """
@@ -75,7 +75,7 @@ class SequenceNumRotateCalculation:
         Args:
             ideal_value: 理想值
             window_apply_method: 窗口计算方法
-            filter_out_partial_overlaped_result: 是否过滤部分重叠结果
+            filter_out_partial_overlapped_result: 是否过滤部分重叠结果
             chunk_size: 每块大小
             
         Returns:
@@ -122,7 +122,7 @@ class SequenceNumRotateCalculation:
         if not all_candidates:
             return []
         
-        return float(closest_score), self._group_consecutive_indices(np.array(all_candidates), filter_out_partial_overlaped_result)
+        return float(closest_score), self._group_consecutive_indices(np.array(all_candidates), filter_out_partial_overlapped_result)
     
     def _group_consecutive_indices(
         self, 
