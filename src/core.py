@@ -158,8 +158,11 @@ class SequenceNumRotateCalculation:
             filtered_result = [result[0]]
             
             for i in range(1, len(result)):
-                if result[i][0] - (filtered_result[-1][0]+filtered_result[-1][1]+self.window-1) >= 0:
-                    filtered_result.append(result[i])
+                next_acceptable_start = filtered_result[-1][0]+filtered_result[-1][1]+self.window-1
+                i_end_position = sum(result[i])-1
+                if (i_end_position - next_acceptable_start) >= 0:
+                    head_strip_num = next_acceptable_start - result[i][0]
+                    filtered_result.append((result[i][0]+head_strip_num, result[i][1]-head_strip_num))
             
             result = filtered_result
             
