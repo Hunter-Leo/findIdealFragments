@@ -8,7 +8,7 @@ import json
 random.seed(0)
 np.random.seed(0)
 
-from src.finder.base import windowFinderinBundleSeqs, seqBundle, seqItem
+from src.finder.ram.base import windowFinderinBundleSeqs, seqBundle, seqItem
 
 def test_simple():
     # simple test

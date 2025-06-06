@@ -8,7 +8,7 @@ import json
 random.seed(0)
 np.random.seed(0)
 
-from src.finder.wordratio import findIdealWordRatioInSlidingWindow, wordSeqBundle, wordSeqItem
+from src.finder.ram.wordratio import findIdealWordRatioInSlidingWindow, wordSeqBundle, wordSeqItem
 
 def test_simple():
     # simple test
