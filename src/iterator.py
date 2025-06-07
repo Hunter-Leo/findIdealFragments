@@ -21,7 +21,8 @@ class IterableSequenceNumRotateCalculation:
         # 使用弱引用存储原始数组，避免复制大数组
         self.arr = arr if isinstance(arr, np.ndarray) else np.array(arr)
         self.length = len(arr)
-        assert window <= self.length, 'window must be less than or equal to the length of the array'
+        # assert window <= self.length, 'window must be less than or equal to the length of the array'
+        print(f'Warning: sequence length {self.length} is smaller than window size {window}.')
         self.excluding_window_list = excluding_window_list
     
     def get_sub_arrs(self, arr:np.ndarray, excluding_window_list:List[List[Tuple[int, int]]]):
@@ -40,10 +41,14 @@ class IterableSequenceNumRotateCalculation:
         last_end = 0
         for start, length in all_windows:
             if start > last_end:
-                sub_arrs.append((last_end, arr[last_end:start]))
+                sub_arr = arr[last_end:start]
+                if len(sub_arr)>=self.window:
+                    sub_arrs.append((last_end, sub_arr))
             last_end = start + length + self.window -1
         if last_end < len(arr):
-            sub_arrs.append((last_end, arr[last_end:]))
+            sub_arr = arr[last_end:]
+            if len(sub_arr)>=self.window:
+                sub_arrs.append((last_end, sub_arr))
         return sub_arrs
     
     def find_next_ideal_windows(
