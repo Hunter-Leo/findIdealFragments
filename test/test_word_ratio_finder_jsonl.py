@@ -15,10 +15,10 @@ def test_simple():
     # simple test
     file = 'test.jsonl'
     # create a jsonl file
-    with JsonlIO(wordSeqItem, file_path=file) as jio:
-        jio.empty()
-        for i in range(100):
-            jio.add_line(wordSeqItem(id=f'mytest_{i}', seq=''.join([random.choice('ATGCN') for _ in range(random.randint(0, 100_000))])))
+    # with JsonlIO(wordSeqItem, file_path=file) as jio:
+    #     jio.empty()
+    #     for i in range(100):
+    #         jio.add_line(wordSeqItem(id=f'mytest_{i}', seq=''.join([random.choice('ATGCN') for _ in range(random.randint(0, 100_000))])))
 
     word_dict = {
         'A': 0,
@@ -33,7 +33,8 @@ def test_simple():
         top=5000,
         ideal_value=1,
         window_apply_method='mean',
-        filter_out_partial_overlapped_result=True
+        filter_out_partial_overlapped_result=True,
+        cache_numeric_file=True
     )
     result = finder.find(save_path='result.jsonl')
     for i in result:
