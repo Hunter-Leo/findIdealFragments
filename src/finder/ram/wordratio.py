@@ -35,7 +35,7 @@ class findIdealWordRatioInSlidingWindow(windowFinderinBundleSeqs):
         for seq in word_bundle.seqs:
             item = seqItem(
                 id=seq.id,
-                seq=[word2num[i] for i in seq.seq]
+                seq=[word2num(i) for i in seq.seq]
             )
             bundle.seqs.append(item)
         return bundle
