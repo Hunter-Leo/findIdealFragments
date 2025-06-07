@@ -63,7 +63,7 @@ class JsonlIO(Generic[T]):
         
         # 确保文件指针在末尾
         self.file.seek(0, os.SEEK_END)
-        json_str = model_instance.model_dump_json(exclude_unset=True)
+        json_str = model_instance.model_dump_json()
         self.file.write(json_str + '\n')
         self.file.flush()
     
