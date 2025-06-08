@@ -1,4 +1,5 @@
 from ..io.jsonl import JsonlIO
+from ..io.utils.jsonl2csv import jsonl2csv
 from ..finder.file.wordratio import findIdealWordRatioInSlidingWindow, wordSeqItem
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
@@ -67,24 +68,33 @@ class findIdealGCContentSegmentsonFasta(findIdealWordRatioInSlidingWindow):
                 jio.add_line(wordSeqItem(id=seq.id, seq=str(seq.seq)))
     
 
-    def find(self, save_path = None):
-        result = super().find(save_path=save_path)
+    def find(self, save_path:str = None, human_readable_idx: bool = True):
+        save_file_type = 'jsonl' if save_path is None else save_path.rsplit('.',1)[-1]
+        save_file_type = 'jsonl' if save_file_type not in ['jsonl', 'csv'] else save_file_type
+        saved_jsonl_file = f'{save_path.rsplit('.',1)[0]}.jsonl'
+        result = super().find(save_path=saved_jsonl_file, human_readable_idx=human_readable_idx)
+        result_length = len(result)
+        if save_file_type == 'csv':
+            jsonl2csv(saved_jsonl_file, save_path)
+            result.close()
+            pathlib.Path(saved_jsonl_file).unlink()
         if not self.cache:
             pathlib.Path(self.cache_jsonl_file).unlink()
-        return result
+        return save_path, result_length
 
 @click.command()
 @click.option('-i', '--input', 'input_file', required=True, help='The input DNA fasta file.')
 @click.option('-w', '--window', 'window', required=True, type=int, help='The sliding window size.')
-@click.option('-t', '--top', 'top', required=False, type=int, default=10, help='The top number of the ideal segments.')
+@click.option('-t', '--top', 'top', required=False, type=int, default=10, help='The top number of the ideal segments.default=10')
 @click.option('-v', '--value', 'ideal_value', required=True, type=float, help='The ideal value of the sliding window.')
 @click.option('-o', '--output', 'output_file', required=True, help='The output file.')
-@click.option('-d', '--dict', 'dict_mode', required=False, default='GC',type=click.Choice(['GC', 'AT']), help='The dictionary mode. It can be "GC" or "AT".')
-@click.option('-m', '--method', 'window_apply_method', required=False, default='mean',type=click.Choice(['mean', 'sum']), help='The method to apply the sliding window. It can be "sum" or "mean".')
-@click.option('-f', '--filter', 'filter_out_partial_overlapped_result', required=False, default=True,type=click.BOOL, help='Whether to filter out the partial overlapped result.')
-@click.option('-b', '--beyond', 'beyond_word_dict_value', required=False, default=0, type=float, help='The value of the beyond word dict.')
-@click.option('-c', '--cache', 'cache', required=False, default=True, type=click.BOOL, help='Whether to cache the jsonl file.')
-def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, window_apply_method, filter_out_partial_overlapped_result, beyond_word_dict_value, cache):
+@click.option('-d', '--dict', 'dict_mode', required=False, default='GC',type=click.Choice(['GC', 'AT']), help='The dictionary mode. It can be "GC" or "AT", default="GC".')
+@click.option('-m', '--method', 'window_apply_method', required=False, default='mean',type=click.Choice(['mean', 'sum']), help='The method to apply the sliding window. It can be "sum" or "mean", default="mean".')
+@click.option('-f', '--filter', 'filter_out_partial_overlapped_result', required=False, default=True,type=click.BOOL, help='Whether to filter out the partial overlapped result, default=True')
+@click.option('-b', '--beyond', 'beyond_word_dict_value', required=False, default=0, type=float, help='The value of the beyond word dict, default=0')
+@click.option('-c', '--cache', 'cache', required=False, default=True, type=click.BOOL, help='Whether to cache the jsonl file, default=True')
+@click.option('-r', '--human-readable', 'human_readable_idx', required=False, default=True, type=click.BOOL, help='Whether to use human readable index, default=True')
+def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, window_apply_method, filter_out_partial_overlapped_result, beyond_word_dict_value, cache, human_readable_idx):
     finder = findIdealGCContentSegmentsonFasta(
         fasta_file=input_file,
         window=window,
@@ -96,8 +106,8 @@ def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, windo
         beyond_word_dict_value=beyond_word_dict_value,
         cache=cache
     )
-    result = finder.find(save_path=output_file)
-    logger.info(f'Found {len(result)} ideal segments, result saved in "{output_file}".')
+    save_path, result_length = finder.find(save_path=output_file, human_readable_idx=human_readable_idx)
+    logger.info(f'Found {result_length} ideal segments, result saved in "{output_file}".')
 
 if __name__ == '__main__':
     run_tool()
