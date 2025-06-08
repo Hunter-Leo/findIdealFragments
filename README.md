@@ -1,6 +1,8 @@
 ## Install
 
 ```bash
+uv sync
+uv build
 uv pip install -e .
 ```
 
