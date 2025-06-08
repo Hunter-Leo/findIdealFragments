@@ -5,6 +5,8 @@ import json
 import pandas as pd
 from ...io.jsonl import JsonlIO
 from pydantic import BaseModel
+import logging
+logger = logging.getLogger(__name__)
 
 class iterResult(BaseModel):
     score: float | None
@@ -47,11 +49,17 @@ class windowFinderinJsonl:
         selected_bundle: JsonlIO[seqItem] = self.file
         selected_max_diff = float('-inf')
 
-        while (len(selected_windows) < self.top) or (len(selected_bundle)>0):
+        round_num = 0
+        found_num = len(selected_windows)
+        seqs_to_seek = len(selected_bundle)
+
+        while (found_num < self.top) or (seqs_to_seek>0):
             current_max_diff = selected_max_diff
-            left = self.top - len(selected_windows)
+            left = self.top - found_num
             current_candidates_windows: JsonlIO[selectedWindow] = JsonlIO(selectedWindow)
             current_candidates_bundle: JsonlIO[seqItem] = JsonlIO(seqItem)
+
+            logger.info(f'Running round {round_num}: {seqs_to_seek} sequences to seek, {left} windows to find...')
 
             # 这一轮要找 n 个窗口
             for seq in selected_bundle:
@@ -96,5 +104,9 @@ class windowFinderinJsonl:
                 selected_max_diff = last_window.score_diff
             selected_bundle.close()
             selected_bundle = current_candidates_bundle
+
+            round_num += 1
+            found_num = len(selected_windows)
+            seqs_to_seek = len(selected_bundle)
 
         return selected_windows

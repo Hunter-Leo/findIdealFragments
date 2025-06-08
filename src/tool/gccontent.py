@@ -6,6 +6,14 @@ import click
 import json
 from typing import Literal, Iterator
 import pathlib
+import logging
+logger = logging.getLogger(__name__)
+# 创建一个基本的日志格式
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 class findIdealGCContentSegmentsonFasta(findIdealWordRatioInSlidingWindow):
     def __init__(
@@ -51,6 +59,7 @@ class findIdealGCContentSegmentsonFasta(findIdealWordRatioInSlidingWindow):
     def fasta2jsonl(cls, fasta_file: str, jsonl_file:str):
         '''Convert the DNA fasta file to jsonl file.
         '''
+        logger.info(f'Converting "{fasta_file}" to "{jsonl_file}"...')
         with JsonlIO(wordSeqItem, file_path=jsonl_file, mode='w') as jio:
             jio.empty()
             parser: Iterator[SeqRecord] = SeqIO.parse(fasta_file, 'fasta')
@@ -88,6 +97,7 @@ def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, windo
         cache=cache
     )
     result = finder.find(save_path=output_file)
+    logger.info(f'Found {len(result)} ideal segments, result saved in "{output_file}".')
 
 if __name__ == '__main__':
     run_tool()

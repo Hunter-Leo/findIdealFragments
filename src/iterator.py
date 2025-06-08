@@ -1,6 +1,8 @@
 import numpy as np
 from typing import List, Tuple, Literal
 from .core import SequenceNumRotateCalculation
+import logging
+logger = logging.getLogger(__name__)
 
 class IterableSequenceNumRotateCalculation:
     def __init__(
@@ -23,7 +25,7 @@ class IterableSequenceNumRotateCalculation:
         self.length = len(arr)
         # assert window <= self.length, 'window must be less than or equal to the length of the array'
         if window > self.length:
-            print(f'Warning: sequence length {self.length} is smaller than window size {window}.')
+            logging.warning(f'Sequence length {self.length} is smaller than window size {window}.')
         self.excluding_window_list = excluding_window_list
     
     def get_sub_arrs(self, arr:np.ndarray, excluding_window_list:List[List[Tuple[int, int]]]):

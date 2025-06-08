@@ -1,6 +1,8 @@
 from .base import windowFinderinJsonl, JsonlIO, seqItem
 from typing import Literal, List, Dict
 import pathlib
+import logging
+logger = logging.getLogger(__name__)
 
 class wordSeqItem(seqItem):
     seq: str
@@ -26,6 +28,7 @@ class findIdealWordRatioInSlidingWindow(windowFinderinJsonl):
         super().__init__(self.numeric_file.file_path, window, top, ideal_value, window_apply_method, filter_out_partial_overlapped_result)
     
     def load_numeric_file(self):
+        logger.info(f'Loading numeric file for "{self.word_file.file_path}"...')
         if self.cache_numeric_file:
             cache_file_path = self.cache_numeric_file \
                 if isinstance(self.cache_numeric_file, str) \
@@ -38,6 +41,7 @@ class findIdealWordRatioInSlidingWindow(windowFinderinJsonl):
 
         else:
             self.numeric_file = self.to_numeric_file(self.word_file, self.word_dict, self.beyond_word_dict_value)
+        logger.info(f'Numeric file loaded from "{self.numeric_file.file_path}".')
 
     @classmethod
     def to_numeric_file(
