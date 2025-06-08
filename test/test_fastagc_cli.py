@@ -4,8 +4,8 @@ import os
 import json
 import tempfile
 from click.testing import CliRunner
-from src.tool.gccontent import run_tool
-from src.io.jsonl import JsonlIO
+from src.find_ideal_segments.tool.gccontent import run_tool
+from src.find_ideal_segments.io.jsonl import JsonlIO
 
 def create_example_fasta(file_path):
     """创建一个简单的示例FASTA文件，包含明确的GC和AT含量区域"""
