@@ -1,4 +1,4 @@
-from ..iterator import IterableSequenceNumRotateCalculation
+from ...iterator import IterableSequenceNumRotateCalculation
 from typing import List, Literal, Annotated
 from typing import Tuple
 import json
