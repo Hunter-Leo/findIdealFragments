@@ -122,7 +122,7 @@ class findIdealWordRatioInSlidingWindow(windowFinderinJsonl):
                 if human_readable_idx:
                     item.start_idx += 1
                     item.end_idx += 1
-                tmp_result_file.add_line(selectedWindowExtended(**item.model_dump(), seq=find_seq(item.seq_id)))
+                tmp_result_file.add_line(selectedWindowExtended(**item.model_dump(), seq=seq))
 
             result_file_path = result_file.file_path
             result_file.close()
