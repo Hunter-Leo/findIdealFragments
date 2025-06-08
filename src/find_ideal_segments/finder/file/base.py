@@ -53,7 +53,7 @@ class windowFinderinJsonl:
         found_num = len(selected_windows)
         seqs_to_seek = len(selected_bundle)
 
-        while (found_num < self.top) or (seqs_to_seek>0):
+        while seqs_to_seek>0:
             current_max_diff = selected_max_diff
             left = self.top - found_num
             current_candidates_windows: JsonlIO[selectedWindow] = JsonlIO(selectedWindow)
