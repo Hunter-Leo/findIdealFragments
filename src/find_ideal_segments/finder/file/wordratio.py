@@ -1,11 +1,15 @@
-from .base import windowFinderinJsonl, JsonlIO, seqItem
+from .base import windowFinderinJsonl, JsonlIO, seqItem, selectedWindow
 from typing import Literal, List, Dict
 import pathlib
 import logging
+import shutil
 logger = logging.getLogger(__name__)
 
 class wordSeqItem(seqItem):
     seq: str
+
+class selectedWindowExtended(selectedWindow):
+    seq: str = None
 
 class findIdealWordRatioInSlidingWindow(windowFinderinJsonl):
     def __init__(
@@ -65,8 +69,63 @@ class findIdealWordRatioInSlidingWindow(windowFinderinJsonl):
             numeric_file.add_line(item)
         return numeric_file
     
-    def find(self, save_path = None):
+    def find(self, save_path = None, human_readable_idx: bool = True)->JsonlIO[selectedWindowExtended]:
         result = super().find(save_path=save_path)
+        logger.info(f'Compute completed. Decyphering result, human readable index:{human_readable_idx}...')
+        result = self.decypher_result(self.word_file, result, human_readable_idx)
         self.numeric_file.close()
         self.word_file.close()
         return result
+    
+    def decypher_result(
+        self, word_file:JsonlIO[wordSeqItem], result_file:JsonlIO[selectedWindow], human_readable_idx: bool = True
+    )->JsonlIO[selectedWindowExtended]:
+
+        class cache:
+            def __init__(self, cache_size:int=100): 
+                self.cache_size = cache_size
+                self.cache_ = dict()
+
+            def add(self, key, value):
+                if len(self.cache_) > self.cache_size:
+                    self.cache_.clear()
+                self.cache_[key] = value
+            
+            def get(self, key):
+                if key in self.cache_:
+                    return self.cache_[key]
+                else:
+                    return None
+        
+        first_cache = cache(cache_size=1000)
+        second_cache = cache(cache_size=1000)
+
+        def find_seq(id: str)->str:
+            first = first_cache.get(id)
+            second = second_cache.get(id)
+            if (first is not None) or (second is not None):
+                value = first or second
+                first_cache.add(id, value)
+                second_cache.add(id, value)
+            else:
+                for seq in word_file:
+                    second_cache.add(id, seq.seq)
+                    if seq.id == id:
+                        first_cache.add(id, seq.seq)
+                        break
+            return first_cache.get(id)
+        
+        with JsonlIO[selectedWindowExtended](selectedWindowExtended) as tmp_result_file:
+            for item in result_file:
+                seq = find_seq(item.seq_id)
+                seq = seq[item.start_idx:item.end_idx+1]
+                if human_readable_idx:
+                    item.start_idx += 1
+                    item.end_idx += 1
+                tmp_result_file.add_line(selectedWindowExtended(**item.model_dump(), seq=find_seq(item.seq_id)))
+
+            result_file_path = result_file.file_path
+            result_file.close()
+            # 使用临时文件替换原始文件
+            shutil.copy2(tmp_result_file.file_path, result_file_path)
+            return JsonlIO(selectedWindowExtended,result_file_path)
