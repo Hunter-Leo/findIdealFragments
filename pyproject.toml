@@ -1,5 +1,5 @@
 [project]
-name = "rotate-calculation"
+name = "find-ideal-segments"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -11,6 +11,9 @@ dependencies = [
     "pandas>=2.3.0",
     "pydantic>=2.11.5",
 ]
+
+[project.scripts]
+gccontent = "find_ideal_segments.tool.gccontent:run_tool"
 
 [[tool.uv.index]]
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
