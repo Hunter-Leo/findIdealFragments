@@ -17,7 +17,7 @@ random.seed(0)
 np.random.seed(0)
 
 import json
-from src.finder.file.base import windowFinderinJsonl, seqItem
+from src.find_ideal_segments.finder.file.base import windowFinderinJsonl, seqItem
 
 def test_simple():
     file = 'test.jsonl'
@@ -58,5 +58,5 @@ def test_large():
 
 
 if __name__ == '__main__':
-    # test_simple()
-    test_large()
+    test_simple()
+    # test_large()
