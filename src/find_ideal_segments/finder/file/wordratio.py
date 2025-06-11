@@ -22,14 +22,15 @@ class findIdealWordRatioInSlidingWindow(windowFinderinJsonl):
         window_apply_method: Literal['sum', 'mean'] = 'mean',
         filter_out_partial_overlapped_result: bool = True,
         beyond_word_dict_value: float|int = 0,
-        cache_numeric_file: bool|str = False
+        cache_numeric_file: bool|str = False,
+        sort_chunk_size: int = 10_000_000
     ):
         self.word_file:JsonlIO[wordSeqItem] = JsonlIO(wordSeqItem, file_path=word_file, mode='r')
         self.word_dict = word_dict
         self.beyond_word_dict_value = beyond_word_dict_value
         self.cache_numeric_file = cache_numeric_file
         self.load_numeric_file()
-        super().__init__(self.numeric_file.file_path, window, top, ideal_value, window_apply_method, filter_out_partial_overlapped_result)
+        super().__init__(self.numeric_file.file_path, window, top, ideal_value, window_apply_method, filter_out_partial_overlapped_result, sort_chunk_size)
     
     def load_numeric_file(self):
         logger.info(f'Loading numeric file for "{self.word_file.file_path}"...')

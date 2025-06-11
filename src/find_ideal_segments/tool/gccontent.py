@@ -27,7 +27,8 @@ class findIdealGCContentSegmentsonFasta(findIdealWordRatioInSlidingWindow):
         dict_mode: Literal['GC', 'AT']|dict = 'GC',
         window_apply_method: Literal['sum', 'mean'] = 'mean',
         filter_out_partial_overlapped_result: bool = True,
-        cache: bool = True
+        cache: bool = True,
+        sort_chunk_size: int = 10_000_000
     ):
         # generate class annotation below
         '''Find the ideal GC content segments in the DNA fasta file.
@@ -53,7 +54,8 @@ class findIdealGCContentSegmentsonFasta(findIdealWordRatioInSlidingWindow):
             window_apply_method=window_apply_method,
             filter_out_partial_overlapped_result=filter_out_partial_overlapped_result,
             beyond_word_dict_value=beyond_word_dict_value,
-            cache_numeric_file=cache
+            cache_numeric_file=cache,
+            sort_chunk_size=sort_chunk_size
         )
     
     @classmethod
@@ -94,7 +96,8 @@ class findIdealGCContentSegmentsonFasta(findIdealWordRatioInSlidingWindow):
 @click.option('-b', '--beyond', 'beyond_word_dict_value', required=False, default=0, type=float, help='The value of the beyond word dict, default=0')
 @click.option('-c', '--cache', 'cache', required=False, default=True, type=click.BOOL, help='Whether to cache the jsonl file, default=True')
 @click.option('-r', '--human-readable', 'human_readable_idx', required=False, default=True, type=click.BOOL, help='Whether to use human readable index, default=True')
-def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, window_apply_method, filter_out_partial_overlapped_result, beyond_word_dict_value, cache, human_readable_idx):
+@click.option('-s', '--sort-chunk-size', 'sort_chunk_size', required=False, default=10_000_000, type=int, help='The chunk size of the sorting, bigger means more memory usage but faster to sort your result, default=10_000_000')
+def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, window_apply_method, filter_out_partial_overlapped_result, beyond_word_dict_value, cache, human_readable_idx, sort_chunk_size):
     finder = findIdealGCContentSegmentsonFasta(
         fasta_file=input_file,
         window=window,
@@ -104,7 +107,8 @@ def run_tool(input_file, window, top, ideal_value, output_file, dict_mode, windo
         window_apply_method=window_apply_method,
         filter_out_partial_overlapped_result=filter_out_partial_overlapped_result,
         beyond_word_dict_value=beyond_word_dict_value,
-        cache=cache
+        cache=cache,
+        sort_chunk_size=sort_chunk_size
     )
     save_path, result_length = finder.find(save_path=output_file, human_readable_idx=human_readable_idx)
     logger.info(f'Found {result_length} ideal segments, result saved in "{output_file}".')

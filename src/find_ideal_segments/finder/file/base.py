@@ -34,7 +34,8 @@ class windowFinderinJsonl:
         top:int,
         ideal_value: float,
         window_apply_method: Literal['sum', 'mean'] = 'mean',
-        filter_out_partial_overlapped_result: bool = True
+        filter_out_partial_overlapped_result: bool = True,
+        sort_chunk_size: int = 10_000_000
     ):
         self.file: JsonlIO[seqItem]= JsonlIO(seqItem, file_path=file, mode='r')
         self.window = window
@@ -42,6 +43,7 @@ class windowFinderinJsonl:
         self.ideal_value = ideal_value
         self.window_apply_method = window_apply_method
         self.filter_out_partial_overlapped_result = filter_out_partial_overlapped_result
+        self.sort_chunk_size = sort_chunk_size
     
     def find(self, save_path:str=None)-> JsonlIO[selectedWindow]:
         selected_windows: JsonlIO[selectedWindow] = JsonlIO(selectedWindow, file_path=save_path)
@@ -97,7 +99,7 @@ class windowFinderinJsonl:
                     current_candidates_bundle.add_line(seq)
 
             [selected_windows.add_line(line) for line in current_candidates_windows]
-            selected_windows.sort_by_fileds(('score_diff', 'start_idx'))
+            selected_windows.sort_by_fileds(('score_diff', 'start_idx'), chunk_size=self.sort_chunk_size)
             selected_windows.head(self.top)
             current_candidates_windows.close()
             for last_window in selected_windows:

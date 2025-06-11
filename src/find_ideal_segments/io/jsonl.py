@@ -107,7 +107,7 @@ class JsonlIO(Generic[T]):
         """返回文件中的行数"""
         return self._calculate_length()
     
-    def sort_by_fileds(self, fields: Tuple[str], reverse: bool = False, chunk_size: int = 10000) -> None:
+    def sort_by_fileds(self, fields: Tuple[str], reverse: bool = False, chunk_size: int = 10_000_000) -> None:
         """
         对JSONL文件进行外部排序
         
