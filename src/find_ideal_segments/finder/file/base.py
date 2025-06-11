@@ -35,7 +35,8 @@ class windowFinderinJsonl:
         ideal_value: float,
         window_apply_method: Literal['sum', 'mean'] = 'mean',
         filter_out_partial_overlapped_result: bool = True,
-        sort_chunk_size: int = 10_000_000
+        sort_chunk_size: int = 10_000_000,
+        precision:int = 4
     ):
         self.file: JsonlIO[seqItem]= JsonlIO(seqItem, file_path=file, mode='r')
         self.window = window
@@ -44,6 +45,7 @@ class windowFinderinJsonl:
         self.window_apply_method = window_apply_method
         self.filter_out_partial_overlapped_result = filter_out_partial_overlapped_result
         self.sort_chunk_size = sort_chunk_size
+        self.precision = precision
     
     def find(self, save_path:str=None)-> JsonlIO[selectedWindow]:
         selected_windows: JsonlIO[selectedWindow] = JsonlIO(selectedWindow, file_path=save_path)
@@ -81,6 +83,7 @@ class windowFinderinJsonl:
                 if score is None: # 该序列已经全部分割完成
                     continue
 
+                score = round(score, self.precision)
                 diff = abs(score - self.ideal_value)
 
                 is_smaller_diff = diff < current_max_diff
