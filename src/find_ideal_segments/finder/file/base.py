@@ -86,7 +86,7 @@ class windowFinderinJsonl:
                 score = round(score, self.precision)
                 diff = abs(score - self.ideal_value)
 
-                is_smaller_diff = diff < current_max_diff
+                is_smaller_diff = diff <= current_max_diff
                 
                 if (len(current_candidates_windows)<left) or (is_smaller_diff):
                     if not is_smaller_diff:
