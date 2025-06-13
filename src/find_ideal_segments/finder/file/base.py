@@ -101,6 +101,8 @@ class windowFinderinJsonl:
                     )) for i in windows]
                     current_candidates_bundle.add_line(seq)
 
+            current_candidates_windows.sort_by_fileds(('score_diff', 'start_idx'), chunk_size=self.sort_chunk_size)
+            current_candidates_windows.head(left)
             [selected_windows.add_line(line) for line in current_candidates_windows]
             selected_windows.sort_by_fileds(('score_diff', 'start_idx'), chunk_size=self.sort_chunk_size)
             selected_windows.head(self.top)
