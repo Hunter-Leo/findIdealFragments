@@ -43,7 +43,8 @@ class SequenceNumRotateCalculation:
         self, 
         ideal_value: float, 
         window_apply_method: Literal['sum', 'mean'] = 'mean',
-        filter_out_partial_overlapped_result: bool = True
+        filter_out_partial_overlapped_result: bool = True,
+        cached_rotate_window_values: np.ndarray = None
     ) -> Tuple[float, List[Tuple[int, int]]]:
         """
         查找最接近理想值的连续窗口
@@ -58,7 +59,7 @@ class SequenceNumRotateCalculation:
         """
         # 对于超大数组，使用分块处理
         return self._find_ideal_windows_chunked(
-                ideal_value, window_apply_method, filter_out_partial_overlapped_result
+                ideal_value, window_apply_method, filter_out_partial_overlapped_result, cached_rotate_window_values=cached_rotate_window_values
             )
             
         
@@ -67,7 +68,8 @@ class SequenceNumRotateCalculation:
         ideal_value: float,
         window_apply_method: Literal['sum', 'mean'] = 'mean',
         filter_out_partial_overlapped_result: bool = True,
-        chunk_size: int = 10**6
+        chunk_size: int = 10**6,
+        cached_rotate_window_values: np.ndarray = None
     ) ->  Tuple[float, List[Tuple[int, int]]]:
         """
         分块处理大数组，查找理想窗口
@@ -96,10 +98,13 @@ class SequenceNumRotateCalculation:
             chunk_arr = self.arr[start_idx:end_idx].astype(np.float64)
 
             # 计算当前块的窗口值
-            chunk_window_values = self.rotate_on_window(arr=chunk_arr, method=window_apply_method)
+            if cached_rotate_window_values is not None:
+                chunk_window_values = cached_rotate_window_values[start_idx:start_idx+len(chunk_arr)-self.window+1]
+            else:
+                chunk_window_values = self.rotate_on_window(arr=chunk_arr, method=window_apply_method)
             
             # 计算与理想值的差异
-            chunk_diff = np.abs(chunk_window_values - ideal_value).astype(np.float32)
+            chunk_diff = np.abs(chunk_window_values - ideal_value).astype(np.float64)
             chunk_min_diff = np.min(chunk_diff)
             
             # 更新全局最小差异
