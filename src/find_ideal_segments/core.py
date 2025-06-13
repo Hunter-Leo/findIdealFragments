@@ -87,17 +87,13 @@ class SequenceNumRotateCalculation:
         
         # 计算总块数
         total_chunks = (self.length - self.window + chunk_size) // chunk_size
-
-        # 增加中间连接块
-        total_chunks = total_chunks*2 -1
-        half_chunk_size = chunk_size//2
         
         for chunk_idx in range(total_chunks):
-            start_idx = chunk_idx * half_chunk_size
+            start_idx = chunk_idx*chunk_size
             end_idx = min(start_idx + chunk_size + self.window - 1, self.length)
             
             # 提取当前块
-            chunk_arr = self.arr[start_idx:end_idx]
+            chunk_arr = self.arr[start_idx:end_idx].astype(np.float64)
 
             # 计算当前块的窗口值
             chunk_window_values = self.rotate_on_window(arr=chunk_arr, method=window_apply_method)
