@@ -84,7 +84,7 @@ class windowFinderinJsonl:
                     continue
 
                 score = round(score, self.precision)
-                diff = abs(score - self.ideal_value)
+                diff = round(abs(score - self.ideal_value), self.precision)
 
                 is_smaller_diff = diff <= current_max_diff
                 
